@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package todo;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service TodoService {
+  rpc List(ListRequest) returns (Todos) {}
+  rpc Create(CreateRequest) returns (Todo) {}
+  rpc GetByID(TodoID) returns (Todo) {}
+  rpc Update(UpdateRequest) returns (Todo) {}
+  rpc Delete(TodoID) returns (google.protobuf.Empty) {}
+}
+
+message ListRequest {}
+
+message Todo {
+  string id = 1;
+  string title = 2;
+  string body = 3;
+  bool is_completed = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message Todos {
+  repeated Todo todos = 1;
+}
+
+message CreateRequest {
+  string title = 1;
+  string body = 2;
+}
+
+message TodoID {
+  string id = 1;
+}
+
+message UpdateRequest {
+  string id = 1;
+  string title = 2;
+  string body = 3;
+  bool is_completed = 4;
+}
