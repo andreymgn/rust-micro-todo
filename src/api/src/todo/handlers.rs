@@ -2,10 +2,10 @@ use tonic::transport::Channel;
 use warp::http::StatusCode;
 use warp::reject;
 
-use super::models;
 use super::super::error::Error::RPCError;
-use super::todo_service as pb;
-use super::todo_service::todo_service_client::TodoServiceClient;
+use crate::todo::service::todo_service as pb;
+use crate::todo::service::todo_service::todo_service_client::TodoServiceClient;
+use crate::todo::models;
 
 pub async fn list_todos(mut client: TodoServiceClient<Channel>) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::ListRequest {});

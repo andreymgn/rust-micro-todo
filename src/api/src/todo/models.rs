@@ -1,7 +1,7 @@
 use chrono::{DateTime, TimeZone, Utc};
 use serde_derive::{Deserialize, Serialize};
 
-use super::todo_service as pb;
+use crate::todo::service::todo_service as pb;
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct CreateTodo {

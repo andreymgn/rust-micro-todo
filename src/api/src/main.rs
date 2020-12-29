@@ -1,8 +1,9 @@
-use todo::todo_service::todo_service_client::TodoServiceClient;
-use warp::Filter;
-
-mod todo;
 mod error;
+mod todo;
+
+use todo::service::todo_service::todo_service_client::TodoServiceClient;
+use todo::routes::todo_filter;
+use warp::Filter;
 
 #[tokio::main]
 async fn main() {
@@ -16,7 +17,7 @@ async fn main() {
     };
 
     let health_route = warp::path("health").map(|| "OK");
-    let todo_filter = todo::todo_filter(client);
+    let todo_filter = todo_filter(client);
     let routes = health_route.or(todo_filter).recover(error::handle_rejection);
 
     // Start up the server...

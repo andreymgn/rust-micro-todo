@@ -1,14 +1,9 @@
 use tonic::transport::Channel;
 use warp::Filter;
 
-use todo_service::todo_service_client::TodoServiceClient;
-
-mod handlers;
-mod models;
-
-pub mod todo_service {
-    tonic::include_proto!("todo");
-}
+use crate::todo::service::todo_service::todo_service_client::TodoServiceClient;
+use crate::todo::handlers;
+use crate::todo::models;
 
 pub fn todo_filter(
     client: TodoServiceClient<Channel>
