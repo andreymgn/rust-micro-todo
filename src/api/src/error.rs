@@ -25,45 +25,40 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
 
     if err.is_not_found() {
         code = StatusCode::NOT_FOUND;
-        status = "not found";
-        message = "not found";
+        status = "not found".to_string();
+        message = "not found".to_string();
     } else if let Some(_) = err.find::<warp::filters::body::BodyDeserializeError>() {
         code = StatusCode::BAD_REQUEST;
-        status = "invalid body";
-        message = "invalid body";
+        status = "invalid body".to_string();
+        message = "invalid body".to_string();
     } else if let Some(e) = err.find::<Error>() {
         match e {
             Error::RPCError(st) => {
                 code = map_status_code(&st);
-                status = "rpc error";
-                let json = warp::reply::json(&ErrorResponse {
-                    status: status.into(),
-                    message: st.to_string(),
-                });
-
-                return Ok(warp::reply::with_status(json, code));
+                status = "rpc error".to_string();
+                message = st.to_string();
             }
             _ => {
                 eprintln!("unhandled application error: {:?}", err);
                 code = StatusCode::INTERNAL_SERVER_ERROR;
-                status = "internal server error";
-                message = "Internal server error";
+                status = "internal server error".to_string();
+                message = "Internal server error".to_string();
             }
         }
     } else if let Some(_) = err.find::<warp::reject::MethodNotAllowed>() {
         code = StatusCode::METHOD_NOT_ALLOWED;
-        status = "method not allowed";
-        message = "method not allowed";
+        status = "method not allowed".to_string();
+        message = "method not allowed".to_string();
     } else {
         eprintln!("unhandled error: {:?}", err);
         code = StatusCode::INTERNAL_SERVER_ERROR;
-        status = "internal server error";
-        message = "internal server error";
+        status = "internal server error".to_string();
+        message = "internal server error".to_string();
     }
 
     let json = warp::reply::json(&ErrorResponse {
-        status: status.into(),
-        message: message.into(),
+        status,
+        message,
     });
 
     Ok(warp::reply::with_status(json, code))
