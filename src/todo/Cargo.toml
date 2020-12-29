@@ -12,6 +12,9 @@ prost = "0.6"
 prost-types = "0.6"
 tokio = { version = "0.2", features = ["macros"] }
 libxid = "0.1.5"
+slog = "2"
+slog-async = "2"
+slog-bunyan = "2"
 
 [build-dependencies]
 tonic-build = "0.3"
