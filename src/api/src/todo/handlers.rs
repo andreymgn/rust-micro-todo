@@ -57,3 +57,12 @@ pub async fn delete_todo(id: String, mut client: TodoServiceClient<Channel>) -> 
 
     Ok(StatusCode::NO_CONTENT)
 }
+
+pub async fn complete_todo(id: String, mut client: TodoServiceClient<Channel>) -> Result<impl warp::Reply, warp::Rejection> {
+    let req = tonic::Request::new(pb::TodoId { id });
+    let resp = client.complete(req).await.map_err(|e| reject::custom(RPCError(e)))?;
+
+    let body = models::Todo::from(resp.into_inner());
+
+    Ok(warp::reply::json(&body))
+}

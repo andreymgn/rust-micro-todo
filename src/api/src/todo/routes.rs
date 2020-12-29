@@ -13,9 +13,10 @@ pub fn todo_filter(
         .or(create_todo(client.clone()))
         .or(update_todo(client.clone()))
         .or(delete_todo(client.clone()))
+        .or(complete_todo(client.clone()))
 }
 
-pub fn list_todos(
+fn list_todos(
     client: TodoServiceClient<Channel>
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     warp::path!("todos")
@@ -24,7 +25,7 @@ pub fn list_todos(
         .and_then(handlers::list_todos)
 }
 
-pub fn create_todo(
+fn create_todo(
     client: TodoServiceClient<Channel>
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     warp::path!("todos")
@@ -34,7 +35,7 @@ pub fn create_todo(
         .and_then(handlers::create_todo)
 }
 
-pub fn get_todo(
+fn get_todo(
     client: TodoServiceClient<Channel>
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     warp::path!("todos" / String)
@@ -43,7 +44,7 @@ pub fn get_todo(
         .and_then(handlers::get_todo)
 }
 
-pub fn update_todo(
+fn update_todo(
     client: TodoServiceClient<Channel>
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     warp::path!("todos" / String)
@@ -53,13 +54,22 @@ pub fn update_todo(
         .and_then(handlers::update_todo)
 }
 
-pub fn delete_todo(
+fn delete_todo(
     client: TodoServiceClient<Channel>
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     warp::path!("todos" / String)
         .and(warp::delete())
         .and(with_client(client))
         .and_then(handlers::delete_todo)
+}
+
+fn complete_todo(
+    client: TodoServiceClient<Channel>
+) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    warp::path!("todos" / String / "complete")
+        .and(warp::post())
+        .and(with_client(client))
+        .and_then(handlers::complete_todo)
 }
 
 fn with_client(
