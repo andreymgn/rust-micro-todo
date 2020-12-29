@@ -61,14 +61,14 @@ impl TodoService for TodoServiceImpl {
         };
         let now = current_timestamp();
         let todo = pb::Todo {
-            id: id.to_string(),
+            id: id.encode(),
             title: request.get_ref().title.clone(),
             body: request.get_ref().body.clone(),
             is_completed: false,
             created_at: Some(now.clone()),
             updated_at: Some(now.clone()),
         };
-        db.insert(id.to_string(), todo.clone());
+        db.insert(id.encode(), todo.clone());
 
         Ok(tonic::Response::new(todo))
     }
