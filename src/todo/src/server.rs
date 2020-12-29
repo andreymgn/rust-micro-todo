@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::sync::Arc;
-use std::time::{SystemTime, SystemTimeError};
+use std::time::SystemTime;
 
 use tokio::sync::RwLock;
 
@@ -25,13 +25,9 @@ impl TodoServiceImpl {
     }
 }
 
-fn current_timestamp() -> Result<prost_types::Timestamp, SystemTimeError> {
-    let now = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH)?;
-    let seconds = now.as_secs();
-    Ok(prost_types::Timestamp {
-        seconds: seconds as i64,
-        nanos: 0,
-    })
+fn current_timestamp() -> prost_types::Timestamp {
+    let now = SystemTime::now();
+    now.into()
 }
 
 #[tonic::async_trait]
@@ -63,10 +59,7 @@ impl TodoService for TodoServiceImpl {
             Ok(id) => id,
             Err(e) => return Err(tonic::Status::internal(["failed to generate id", &e.to_string()].concat()))
         };
-        let now = match current_timestamp() {
-            Ok(ts) => ts,
-            Err(e) => return Err(tonic::Status::internal(["failed to get time: ", &e.to_string()].concat())),
-        };
+        let now = current_timestamp();
         let todo = pb::Todo {
             id: id.to_string(),
             title: request.get_ref().title.clone(),
@@ -100,10 +93,7 @@ impl TodoService for TodoServiceImpl {
         let mut db = lock.write().await;
         match db.get_mut(&request.get_ref().id) {
             Some(mut todo) => {
-                let now = match current_timestamp() {
-                    Ok(ts) => ts,
-                    Err(e) => return Err(tonic::Status::internal(["failed to get time: ", &e.to_string()].concat())),
-                };
+                let now = current_timestamp();
                 todo.title = request.get_ref().title.clone();
                 todo.body = request.get_ref().body.clone();
                 todo.is_completed = request.get_ref().is_completed;
@@ -114,6 +104,7 @@ impl TodoService for TodoServiceImpl {
             None => Err(tonic::Status::not_found("todo not found")),
         }
     }
+
     async fn delete(
         &self,
         request: tonic::Request<pb::TodoId>,
@@ -123,6 +114,27 @@ impl TodoService for TodoServiceImpl {
         match db.remove(&request.get_ref().id) {
             Some(_) => Ok(tonic::Response::new(())),
             None => Err(tonic::Status::not_found("todo not found"))
+        }
+    }
+
+    async fn complete(
+        &self,
+        request: tonic::Request<pb::TodoId>,
+    ) -> Result<tonic::Response<pb::Todo>, tonic::Status> {
+        let lock = self.db.clone();
+        let mut db = lock.write().await;
+        match db.get_mut(&request.get_ref().id) {
+            Some(mut todo) => {
+                if todo.is_completed {
+                    return Err(tonic::Status::invalid_argument("todo is already completed"));
+                }
+
+                let now = current_timestamp();
+                todo.is_completed = true;
+                todo.updated_at = Some(now);
+                Ok(tonic::Response::new(todo.clone()))
+            }
+            None => Err(tonic::Status::not_found("todo not found")),
         }
     }
 }

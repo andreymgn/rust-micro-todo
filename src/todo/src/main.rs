@@ -1,9 +1,9 @@
-mod server;
-
 use tonic::{transport::Server};
-use server::TodoServiceImpl;
-use server::todo_service::todo_service_server::TodoServiceServer;
 
+use server::todo_service::todo_service_server::TodoServiceServer;
+use server::TodoServiceImpl;
+
+mod server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

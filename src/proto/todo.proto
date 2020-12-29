@@ -11,6 +11,7 @@ service TodoService {
   rpc GetByID(TodoID) returns (Todo) {}
   rpc Update(UpdateRequest) returns (Todo) {}
   rpc Delete(TodoID) returns (google.protobuf.Empty) {}
+  rpc Complete(TodoID) returns (Todo) {}
 }
 
 message ListRequest {}
