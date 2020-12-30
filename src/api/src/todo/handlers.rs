@@ -1,10 +1,11 @@
 use warp::http::StatusCode;
 use warp::reject;
 
-use super::super::error::Error::RPCError;
-use crate::todo::service::todo_service as pb;
 use crate::todo::models;
 use crate::todo::routes::Server;
+use crate::todo::service::todo_service as pb;
+
+use super::super::error::Error::RPCError;
 
 pub(crate) async fn list_todos(mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::ListRequest {});

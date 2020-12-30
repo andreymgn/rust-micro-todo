@@ -1,28 +1,36 @@
 #[macro_use]
+extern crate serde_derive;
+#[macro_use]
 extern crate slog;
 extern crate slog_async;
 extern crate slog_bunyan;
 
+use std::str::FromStr;
+
+use slog::Drain;
+use warp::Filter;
+
+use todo::routes::todo_filter;
+use todo::service::todo_service::todo_service_client::TodoServiceClient;
+
 mod error;
 mod todo;
-
-use todo::service::todo_service::todo_service_client::TodoServiceClient;
-use todo::routes::todo_filter;
-use warp::Filter;
-use slog::Drain;
+mod settings;
 
 #[tokio::main]
-async fn main() {
-    let todos_addr = "http://[::1]:50051";
-    let client = match TodoServiceClient::connect(todos_addr).await {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let api_settings = settings::Settings::new()?;
+
+    let log_level = slog::Level::from_str(api_settings.log_level.as_str()).expect("failed to parse log level");
+    let log = get_logger(log_level);
+
+    let client = match TodoServiceClient::connect(api_settings.todo_addr).await {
         Ok(v) => v,
         Err(err) => {
             println!("{}", err.to_string());
             std::process::exit(1);
         }
     };
-
-    let log = get_logger();
 
     info!(log, "starting";);
 
@@ -36,12 +44,16 @@ async fn main() {
                 info!(log, "handled request"; "method" => info.method().as_str(), "path" => info.path(), "status" => info.status().as_str());
             }));
 
-    warp::serve(routes).run(([127, 0, 0, 1], 8080)).await;
+    warp::serve(routes).run(([127, 0, 0, 1], api_settings.port)).await;
+
+    Ok(())
 }
 
-fn get_logger() -> slog::Logger {
+fn get_logger(log_level: slog::Level) -> slog::Logger {
     let drain = slog_bunyan::default(std::io::stderr())
+        .filter_level(log_level)
         .fuse();
     let drain = slog_async::Async::new(drain).build().fuse();
-    slog::Logger::root(drain, o!("version" => env!("CARGO_PKG_VERSION"), "service" => "todo"))
+
+    slog::Logger::root(drain, o!("version" => env!("CARGO_PKG_VERSION"), "service" => "api"))
 }

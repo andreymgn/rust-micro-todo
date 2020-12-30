@@ -16,7 +16,7 @@ slog = "2"
 slog-async = "2"
 slog-bunyan = "2"
 config = "0.10"
-serde = {version = "1.0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
 
 [build-dependencies]
 tonic-build = "0.3"

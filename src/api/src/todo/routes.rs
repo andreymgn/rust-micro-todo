@@ -1,20 +1,19 @@
 use tonic::transport::Channel;
 use warp::Filter;
 
-use crate::todo::service::todo_service::todo_service_client::TodoServiceClient;
 use crate::todo::handlers;
 use crate::todo::models;
-
+use crate::todo::service::todo_service::todo_service_client::TodoServiceClient;
 
 #[derive(Clone)]
 pub(crate) struct Server {
     pub logger: slog::Logger,
-    pub todo_client: TodoServiceClient<Channel>
+    pub todo_client: TodoServiceClient<Channel>,
 }
 
 pub fn todo_filter(
     logger: slog::Logger,
-    client: TodoServiceClient<Channel>
+    client: TodoServiceClient<Channel>,
 ) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
     let server = Server {
         logger,

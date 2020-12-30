@@ -1,17 +1,18 @@
+extern crate config;
+#[macro_use]
+extern crate serde;
 #[macro_use]
 extern crate slog;
 extern crate slog_async;
 extern crate slog_bunyan;
-extern crate config;
-#[macro_use]
-extern crate serde;
+
+use std::str::FromStr;
 
 use slog::Drain;
 use tonic::{transport::Server};
 
 use server::todo_service::todo_service_server::TodoServiceServer;
 use server::TodoServiceImpl;
-use std::str::FromStr;
 
 mod server;
 mod error;
@@ -20,14 +21,13 @@ mod settings;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let todo_settings = settings::Settings::new()?;
+
     let log_level = slog::Level::from_str(todo_settings.log_level.as_str()).expect("failed to parse log level");
     let log = get_logger(log_level);
+
     let addr = format!("[::1]:{}", todo_settings.port).parse().expect("failed to parse socket address");
-
     info!(log, "started"; "addr" => addr);
-
     let service = TodoServiceImpl::new(log);
-
     Server::builder()
         .add_service(TodoServiceServer::new(service))
         .serve(addr)
