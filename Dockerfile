@@ -9,6 +9,5 @@ RUN cargo install --path $service
 
 FROM debian:buster-slim
 ARG service
-ENV SERVICE_NAME=$service
 COPY --from=builder /usr/local/cargo/bin/$service /usr/local/bin/app
 CMD ["/usr/local/bin/app"]
