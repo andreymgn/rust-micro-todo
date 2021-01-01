@@ -22,4 +22,4 @@ slog-bunyan = "2"
 config = "0.10"
 
 [build-dependencies]
-tonic-build = "0.3"
+tonic-build = { version = "0.3", default-features = false, features = ["transport", "prost"] }

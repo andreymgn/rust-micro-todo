@@ -44,7 +44,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 info!(log, "handled request"; "method" => info.method().as_str(), "path" => info.path(), "status" => info.status().as_str());
             }));
 
-    warp::serve(routes).run(([127, 0, 0, 1], api_settings.port)).await;
+    warp::serve(routes).run(([0, 0, 0, 0], api_settings.port)).await;
 
     Ok(())
 }

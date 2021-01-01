@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let log_level = slog::Level::from_str(todo_settings.log_level.as_str()).expect("failed to parse log level");
     let log = get_logger(log_level);
 
-    let addr = format!("[::1]:{}", todo_settings.port).parse().expect("failed to parse socket address");
+    let addr = format!("0.0.0.0:{}", todo_settings.port).parse().expect("failed to parse socket address");
     info!(log, "started"; "addr" => addr);
     let service = TodoServiceImpl::new(log);
     Server::builder()
