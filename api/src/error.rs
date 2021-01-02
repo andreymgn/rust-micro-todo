@@ -38,12 +38,6 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
                 status = "rpc error".to_string();
                 message = st.to_string();
             }
-            _ => {
-                eprintln!("unhandled application error: {:?}", err);
-                code = StatusCode::INTERNAL_SERVER_ERROR;
-                status = "internal server error".to_string();
-                message = "Internal server error".to_string();
-            }
         }
     } else if let Some(_) = err.find::<warp::reject::MethodNotAllowed>() {
         code = StatusCode::METHOD_NOT_ALLOWED;
