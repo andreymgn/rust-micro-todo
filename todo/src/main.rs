@@ -5,6 +5,8 @@ extern crate serde;
 extern crate slog;
 extern crate slog_async;
 extern crate slog_bunyan;
+#[macro_use]
+extern crate async_trait;
 
 use std::str::FromStr;
 
@@ -14,7 +16,7 @@ use tonic::transport::Server;
 use server::todo_service::todo_service_server::TodoServiceServer;
 use server::TodoServiceImpl;
 
-mod error;
+mod repository;
 mod server;
 mod settings;
 
@@ -29,8 +31,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("0.0.0.0:{}", todo_settings.port)
         .parse()
         .expect("failed to parse socket address");
+    let repo = repository::repository::get_repository(todo_settings.storage, log.clone())?;
+    let service = TodoServiceImpl::new(log.clone(), repo);
     info!(log, "started"; "addr" => addr);
-    let service = TodoServiceImpl::new(log);
     Server::builder()
         .add_service(TodoServiceServer::new(service))
         .serve(addr)

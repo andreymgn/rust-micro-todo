@@ -1,9 +1,11 @@
+use crate::repository::repository;
 use config::{Config, ConfigError, Environment};
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Settings {
     pub log_level: String,
     pub port: u16,
+    pub storage: repository::StorageSettings,
 }
 
 impl Settings {
