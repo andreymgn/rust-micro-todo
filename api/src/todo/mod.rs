@@ -1,4 +1,4 @@
-pub(crate) mod routes;
 mod handlers;
 mod models;
+pub(crate) mod routes;
 pub(crate) mod service;

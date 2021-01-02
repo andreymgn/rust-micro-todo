@@ -52,9 +52,11 @@ pub struct Todos {
 
 impl From<pb::Todos> for Todos {
     fn from(todos: pb::Todos) -> Self {
-        let v = todos.todos.iter().map(|todo| Todo::from(todo.clone())).collect();
-        Todos {
-            todos: v,
-        }
+        let v = todos
+            .todos
+            .iter()
+            .map(|todo| Todo::from(todo.clone()))
+            .collect();
+        Todos { todos: v }
     }
 }

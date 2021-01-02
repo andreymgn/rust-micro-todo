@@ -7,7 +7,9 @@ pub(crate) enum Error {
 impl From<Error> for tonic::Status {
     fn from(e: Error) -> Self {
         match e {
-            Error::IDGenerationError(e) => Status::internal(["failed to generate xid: ", e.to_string().as_str()].concat())
+            Error::IDGenerationError(e) => {
+                Status::internal(["failed to generate xid: ", e.to_string().as_str()].concat())
+            }
         }
     }
 }

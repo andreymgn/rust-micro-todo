@@ -14,14 +14,15 @@ use todo::routes::todo_filter;
 use todo::service::todo_service::todo_service_client::TodoServiceClient;
 
 mod error;
-mod todo;
 mod settings;
+mod todo;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let api_settings = settings::Settings::new()?;
 
-    let log_level = slog::Level::from_str(api_settings.log_level.as_str()).expect("failed to parse log level");
+    let log_level =
+        slog::Level::from_str(api_settings.log_level.as_str()).expect("failed to parse log level");
     let log = get_logger(log_level);
 
     let client = match TodoServiceClient::connect(api_settings.todo_addr).await {
@@ -44,7 +45,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 info!(log, "handled request"; "method" => info.method().as_str(), "path" => info.path(), "status" => info.status().as_str());
             }));
 
-    warp::serve(routes).run(([0, 0, 0, 0], api_settings.port)).await;
+    warp::serve(routes)
+        .run(([0, 0, 0, 0], api_settings.port))
+        .await;
 
     Ok(())
 }
@@ -55,5 +58,8 @@ fn get_logger(log_level: slog::Level) -> slog::Logger {
         .fuse();
     let drain = slog_async::Async::new(drain).build().fuse();
 
-    slog::Logger::root(drain, o!("version" => env!("CARGO_PKG_VERSION"), "service" => "api"))
+    slog::Logger::root(
+        drain,
+        o!("version" => env!("CARGO_PKG_VERSION"), "service" => "api"),
+    )
 }

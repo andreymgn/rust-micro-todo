@@ -14,7 +14,7 @@ pub(crate) struct Server {
 pub fn todo_filter(
     logger: slog::Logger,
     client: TodoServiceClient<Channel>,
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     let server = Server {
         logger,
         todo_client: client,
@@ -29,8 +29,8 @@ pub fn todo_filter(
 }
 
 fn list_todos(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos")
         .and(warp::get())
         .and(with_server(server))
@@ -38,8 +38,8 @@ fn list_todos(
 }
 
 fn create_todo(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos")
         .and(warp::post())
         .and(json_create_body())
@@ -48,8 +48,8 @@ fn create_todo(
 }
 
 fn get_todo(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos" / String)
         .and(warp::get())
         .and(with_server(server))
@@ -57,8 +57,8 @@ fn get_todo(
 }
 
 fn update_todo(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos" / String)
         .and(warp::put())
         .and(json_update_body())
@@ -67,8 +67,8 @@ fn update_todo(
 }
 
 fn delete_todo(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos" / String)
         .and(warp::delete())
         .and(with_server(server))
@@ -76,8 +76,8 @@ fn delete_todo(
 }
 
 fn complete_todo(
-    server: Server
-) -> impl Filter<Extract=impl warp::Reply, Error=warp::Rejection> + Clone {
+    server: Server,
+) -> impl Filter<Extract = impl warp::Reply, Error = warp::Rejection> + Clone {
     warp::path!("todos" / String / "complete")
         .and(warp::post())
         .and(with_server(server))
@@ -85,15 +85,17 @@ fn complete_todo(
 }
 
 fn with_server(
-    server: Server
-) -> impl Filter<Extract=(Server, ), Error=std::convert::Infallible> + Clone {
+    server: Server,
+) -> impl Filter<Extract = (Server,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || server.clone())
 }
 
-fn json_create_body() -> impl Filter<Extract=(models::CreateTodo, ), Error=warp::Rejection> + Clone {
+fn json_create_body(
+) -> impl Filter<Extract = (models::CreateTodo,), Error = warp::Rejection> + Clone {
     warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }
 
-fn json_update_body() -> impl Filter<Extract=(models::UpdateTodo, ), Error=warp::Rejection> + Clone {
+fn json_update_body(
+) -> impl Filter<Extract = (models::UpdateTodo,), Error = warp::Rejection> + Clone {
     warp::body::content_length_limit(1024 * 16).and(warp::body::json())
 }

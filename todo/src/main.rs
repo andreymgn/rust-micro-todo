@@ -9,23 +9,26 @@ extern crate slog_bunyan;
 use std::str::FromStr;
 
 use slog::Drain;
-use tonic::{transport::Server};
+use tonic::transport::Server;
 
 use server::todo_service::todo_service_server::TodoServiceServer;
 use server::TodoServiceImpl;
 
-mod server;
 mod error;
+mod server;
 mod settings;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let todo_settings = settings::Settings::new()?;
 
-    let log_level = slog::Level::from_str(todo_settings.log_level.as_str()).expect("failed to parse log level");
+    let log_level =
+        slog::Level::from_str(todo_settings.log_level.as_str()).expect("failed to parse log level");
     let log = get_logger(log_level);
 
-    let addr = format!("0.0.0.0:{}", todo_settings.port).parse().expect("failed to parse socket address");
+    let addr = format!("0.0.0.0:{}", todo_settings.port)
+        .parse()
+        .expect("failed to parse socket address");
     info!(log, "started"; "addr" => addr);
     let service = TodoServiceImpl::new(log);
     Server::builder()
@@ -42,5 +45,8 @@ fn get_logger(log_level: slog::Level) -> slog::Logger {
         .fuse();
     let drain = slog_async::Async::new(drain).build().fuse();
 
-    slog::Logger::root(drain, o!("version" => env!("CARGO_PKG_VERSION"), "service" => "todo"))
+    slog::Logger::root(
+        drain,
+        o!("version" => env!("CARGO_PKG_VERSION"), "service" => "todo"),
+    )
 }

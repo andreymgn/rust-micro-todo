@@ -19,7 +19,10 @@ pub(crate) async fn list_todos(mut server: Server) -> Result<impl warp::Reply, w
     Ok(warp::reply::json(&body))
 }
 
-pub(crate) async fn create_todo(create: models::CreateTodo, mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
+pub(crate) async fn create_todo(
+    create: models::CreateTodo,
+    mut server: Server,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::CreateRequest {
         title: create.title,
         body: create.body,
@@ -34,7 +37,10 @@ pub(crate) async fn create_todo(create: models::CreateTodo, mut server: Server) 
     Ok(warp::reply::json(&body))
 }
 
-pub(crate) async fn get_todo(id: String, mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
+pub(crate) async fn get_todo(
+    id: String,
+    mut server: Server,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::TodoId { id: id.clone() });
     let resp = server.todo_client.get_by_id(req).await.map_err(|e| {
         error!(server.logger, "get_todo"; "err" => e.to_string(), "id" => id);
@@ -46,7 +52,11 @@ pub(crate) async fn get_todo(id: String, mut server: Server) -> Result<impl warp
     Ok(warp::reply::json(&body))
 }
 
-pub(crate) async fn update_todo(id: String, update: models::UpdateTodo, mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
+pub(crate) async fn update_todo(
+    id: String,
+    update: models::UpdateTodo,
+    mut server: Server,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::UpdateRequest {
         id: id.clone(),
         title: update.title,
@@ -63,7 +73,10 @@ pub(crate) async fn update_todo(id: String, update: models::UpdateTodo, mut serv
     Ok(warp::reply::json(&body))
 }
 
-pub(crate) async fn delete_todo(id: String, mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
+pub(crate) async fn delete_todo(
+    id: String,
+    mut server: Server,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::TodoId { id: id.clone() });
     server.todo_client.delete(req).await.map_err(|e| {
         error!(server.logger, "delete_todo"; "err" => e.to_string(), "id" => id);
@@ -73,7 +86,10 @@ pub(crate) async fn delete_todo(id: String, mut server: Server) -> Result<impl w
     Ok(StatusCode::NO_CONTENT)
 }
 
-pub(crate) async fn complete_todo(id: String, mut server: Server) -> Result<impl warp::Reply, warp::Rejection> {
+pub(crate) async fn complete_todo(
+    id: String,
+    mut server: Server,
+) -> Result<impl warp::Reply, warp::Rejection> {
     let req = tonic::Request::new(pb::TodoId { id: id.clone() });
     let resp = server.todo_client.complete(req).await.map_err(|e| {
         error!(server.logger, "complete_todo"; "err" => e.to_string(), "id" => id);

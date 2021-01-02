@@ -2,8 +2,8 @@ use std::convert::Infallible;
 
 use serde_derive::Serialize;
 use tonic::{Code, Status};
-use warp::{Rejection, Reply};
 use warp::http::StatusCode;
+use warp::{Rejection, Reply};
 
 #[derive(Serialize)]
 pub struct ErrorResponse {
@@ -13,7 +13,7 @@ pub struct ErrorResponse {
 
 #[derive(Debug)]
 pub enum Error {
-    RPCError(tonic::Status)
+    RPCError(tonic::Status),
 }
 
 impl warp::reject::Reject for Error {}
@@ -56,10 +56,7 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
         message = "internal server error".to_string();
     }
 
-    let json = warp::reply::json(&ErrorResponse {
-        status,
-        message,
-    });
+    let json = warp::reply::json(&ErrorResponse { status, message });
 
     Ok(warp::reply::with_status(json, code))
 }

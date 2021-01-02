@@ -48,9 +48,7 @@ impl TodoService for TodoServiceImpl {
             todos.push(v.clone());
         }
 
-        let result = pb::Todos {
-            todos,
-        };
+        let result = pb::Todos { todos };
 
         Ok(tonic::Response::new(result))
     }
@@ -62,11 +60,10 @@ impl TodoService for TodoServiceImpl {
         debug!(self.logger, "create");
         let lock = self.db.clone();
         let mut db = lock.write().await;
-        let id = self.id_generator.new_id()
-            .map_err(|e| {
-                error!(self.logger, "failed to generate xid"; "err" => e.to_string());
-                Error::IDGenerationError(e)
-            })?;
+        let id = self.id_generator.new_id().map_err(|e| {
+            error!(self.logger, "failed to generate xid"; "err" => e.to_string());
+            Error::IDGenerationError(e)
+        })?;
         let now = current_timestamp();
         let todo = pb::Todo {
             id: id.encode(),
