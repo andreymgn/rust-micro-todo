@@ -14,6 +14,8 @@ Contains implementation of todo server according to proto file.
 
 Uses tonic, logging via slog-rs, libxid for id generation.
 
+There are two implementations of todos repository: one based on HashMap and one based on postgres via sqlx crate.
+
 ### api
 
 Implementation of http server which uses todo client.
