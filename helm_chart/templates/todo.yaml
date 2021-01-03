@@ -39,3 +39,5 @@ spec:
               value: "debug"
             - name: TODO_PORT
               value: "50051"
+            - name: TODO_STORAGE
+              value: "HashMap"
