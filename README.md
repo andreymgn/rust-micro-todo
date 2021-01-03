@@ -12,9 +12,9 @@ Contains protobuf service and messages definitions.
 
 Contains implementation of todo server according to proto file.
 
-Uses tonic, logging via slog-rs, libxid for id generation.
+Uses tonic, slog-rs logging, libxid for id generation.
 
-There are two implementations of todos repository: one based on HashMap and one based on postgres via sqlx crate.
+There are two implementations of todos repository: one based on std::collections::HashMap and one based on postgres using sqlx.
 
 ### api
 
