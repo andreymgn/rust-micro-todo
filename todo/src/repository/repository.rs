@@ -1,7 +1,9 @@
 use crate::repository::error::Error;
 use crate::repository::hashmap::HashMapRepository;
 use crate::repository::model::{Todo, Todos};
+use crate::repository::postgres::PostgresRepository;
 use async_trait::async_trait;
+use config::{Config, Environment};
 
 #[async_trait]
 pub trait Repository {
@@ -22,20 +24,30 @@ pub trait Repository {
 #[derive(Debug, Deserialize, Clone)]
 pub struct PostgresSettings {
     pub connection_string: String,
+    pub migrations_path: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
 pub enum StorageSettings {
-    Postgres(PostgresSettings),
+    Postgres,
     HashMap,
 }
 
-pub fn get_repository(
+pub async fn get_repository(
     params: StorageSettings,
     logger: slog::Logger,
 ) -> Result<Box<dyn Repository + Send + Sync>, Box<dyn std::error::Error>> {
     match params {
-        StorageSettings::Postgres(_) => unimplemented!(),
+        StorageSettings::Postgres => {
+            let mut c = Config::default();
+            c.merge(Environment::with_prefix("TODO_POSTGRES"))?;
+            let s = c.try_into::<PostgresSettings>()?;
+
+            let repo = PostgresRepository::new(s.connection_string.as_str()).await?;
+            repo.run_migrations(s.migrations_path.as_str()).await?;
+
+            Ok(Box::new(repo))
+        }
         StorageSettings::HashMap => Ok(Box::new(HashMapRepository::new(logger))),
     }
 }

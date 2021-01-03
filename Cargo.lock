@@ -1943,6 +1943,7 @@ dependencies = [
  "bitflags",
  "byteorder",
  "bytes",
+ "chrono 0.4.19",
  "crc",
  "crossbeam-channel 0.5.0",
  "crossbeam-queue",

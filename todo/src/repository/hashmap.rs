@@ -51,20 +51,17 @@ impl Repository for HashMapRepository {
     async fn create(&self, title: String, body: String) -> Result<Todo, Error> {
         let lock = self.db.clone();
         let mut db = lock.write().await;
-        let id = self.id_generator.new_id().map_err(|e| {
-            error!(self.logger, "failed to generate xid"; "err" => e.to_string());
-            Error::IDGenerationError
-        })?;
+        let id = self.id_generator.new_id()?.encode();
         let now = Utc::now();
         let todo = Todo {
-            id: id.encode(),
+            id: id.clone(),
             title,
             body,
             is_completed: false,
             created_at: now,
             updated_at: now,
         };
-        db.insert(id.encode(), todo.clone());
+        db.insert(id, todo.clone());
         Ok(todo)
     }
 

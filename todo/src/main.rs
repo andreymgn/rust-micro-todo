@@ -31,7 +31,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = format!("0.0.0.0:{}", todo_settings.port)
         .parse()
         .expect("failed to parse socket address");
-    let repo = repository::repository::get_repository(todo_settings.storage, log.clone())?;
+    let repo = repository::repository::get_repository(todo_settings.storage, log.clone()).await?;
     let service = TodoServiceImpl::new(log.clone(), repo);
     info!(log, "started"; "addr" => addr);
     Server::builder()

@@ -29,9 +29,18 @@ impl TodoService for TodoServiceImpl {
     ) -> Result<tonic::Response<pb::Todos>, tonic::Status> {
         debug!(self.logger, "list";);
 
-        let todos = self.repo.list().await?;
+        let result = self.repo.list().await;
 
-        Ok(tonic::Response::new(todos.into()))
+        match result {
+            Ok(todos) => {
+                debug!(self.logger, "list result"; "result" => ?todos);
+                Ok(tonic::Response::new(todos.into()))
+            }
+            Err(e) => {
+                error!(self.logger, "list"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 
     async fn create(
@@ -40,15 +49,20 @@ impl TodoService for TodoServiceImpl {
     ) -> Result<tonic::Response<pb::Todo>, tonic::Status> {
         debug!(self.logger, "create");
 
-        let todo = self
-            .repo
-            .create(
-                request.get_ref().title.clone(),
-                request.get_ref().body.clone(),
-            )
-            .await?;
+        let title = request.get_ref().title.clone();
+        let body = request.get_ref().body.clone();
 
-        Ok(tonic::Response::new(todo.into()))
+        let result = self.repo.create(title, body).await;
+        match result {
+            Ok(todo) => {
+                debug!(self.logger, "create result"; "result" => ?todo);
+                Ok(tonic::Response::new(todo.into()))
+            }
+            Err(e) => {
+                error!(self.logger, "create"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 
     async fn get_by_id(
@@ -58,9 +72,18 @@ impl TodoService for TodoServiceImpl {
         debug!(self.logger, "get_by_id";);
 
         let id = &request.get_ref().id;
-        let todo = self.repo.get(id).await?;
 
-        Ok(tonic::Response::new(todo.into()))
+        let result = self.repo.get(id).await;
+        match result {
+            Ok(todo) => {
+                debug!(self.logger, "get_by_id result"; "result" => ?todo);
+                Ok(tonic::Response::new(todo.into()))
+            }
+            Err(e) => {
+                error!(self.logger, "get_by_id"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 
     async fn update(
@@ -73,9 +96,18 @@ impl TodoService for TodoServiceImpl {
         let title = request.get_ref().title.clone();
         let body = request.get_ref().body.clone();
         let is_completed = request.get_ref().is_completed;
-        let todo = self.repo.update(id, title, body, is_completed).await?;
 
-        Ok(tonic::Response::new(todo.into()))
+        let result = self.repo.update(id, title, body, is_completed).await;
+        match result {
+            Ok(todo) => {
+                debug!(self.logger, "update result"; "result" => ?todo);
+                Ok(tonic::Response::new(todo.into()))
+            }
+            Err(e) => {
+                error!(self.logger, "update"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 
     async fn delete(
@@ -85,9 +117,15 @@ impl TodoService for TodoServiceImpl {
         debug!(self.logger, "delete";);
 
         let id = &request.get_ref().id.clone();
-        self.repo.delete(id).await?;
+        let result = self.repo.delete(id).await;
 
-        Ok(tonic::Response::new(()))
+        match result {
+            Ok(_) => Ok(tonic::Response::new(())),
+            Err(e) => {
+                error!(self.logger, "delete"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 
     async fn complete(
@@ -97,8 +135,17 @@ impl TodoService for TodoServiceImpl {
         debug!(self.logger, "complete";);
 
         let id = &request.get_ref().id;
-        let todo = self.repo.complete(id).await?;
+        let result = self.repo.complete(id).await;
 
-        Ok(tonic::Response::new(todo.into()))
+        match result {
+            Ok(todo) => {
+                debug!(self.logger, "complete result"; "result" => ?todo);
+                Ok(tonic::Response::new(todo.into()))
+            }
+            Err(e) => {
+                error!(self.logger, "complete"; "err" => ?e);
+                Err(e.into())
+            }
+        }
     }
 }

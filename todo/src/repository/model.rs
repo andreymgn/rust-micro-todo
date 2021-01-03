@@ -1,7 +1,7 @@
 use super::super::server::todo_service as pb;
-use chrono::{DateTime, Timelike, Utc};
+use chrono::{DateTime, Utc};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, sqlx::FromRow)]
 pub struct Todo {
     pub id: String,
     pub title: String,
@@ -14,12 +14,12 @@ pub struct Todo {
 impl Into<pb::Todo> for Todo {
     fn into(self) -> pb::Todo {
         let created_at = prost_types::Timestamp {
-            seconds: self.created_at.second() as i64,
-            nanos: self.created_at.nanosecond() as i32,
+            seconds: self.created_at.timestamp(),
+            nanos: self.created_at.timestamp_subsec_nanos() as i32,
         };
         let updated_at = prost_types::Timestamp {
-            seconds: self.updated_at.second() as i64,
-            nanos: self.updated_at.nanosecond() as i32,
+            seconds: self.updated_at.timestamp(),
+            nanos: self.updated_at.timestamp_subsec_nanos() as i32,
         };
         pb::Todo {
             id: self.id,

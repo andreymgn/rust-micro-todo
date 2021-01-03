@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS todos
+(
+    id VARCHAR(20) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    body TEXT,
+    is_completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
